@@ -10,6 +10,7 @@ import {
   COMPUTER_PROBLEMS,
 } from "@/lib/utils";
 import { getModelSuggestions } from "@/lib/api";
+import Icon from "@/components/Icons";
 
 /**
  * DeviceStep — Step 2 of ticket creation.
@@ -17,9 +18,14 @@ import { getModelSuggestions } from "@/lib/api";
  * model with autocomplete, serial number with barcode scanner support.
  */
 export default function DeviceStep({
-  form, updateField, errors, ic,
-  customCategory, setCustomCategory,
-  customBrand, setCustomBrand,
+  form,
+  updateField,
+  errors,
+  ic,
+  customCategory,
+  setCustomCategory,
+  customBrand,
+  setCustomBrand,
 }) {
   const [modelQuery, setModelQuery] = useState(form.model || "");
   const [suggestions, setSuggestions] = useState([]);
@@ -34,7 +40,10 @@ export default function DeviceStep({
   // Close suggestions on outside click
   useEffect(() => {
     function handleClick(e) {
-      if (suggestionsRef.current && !suggestionsRef.current.contains(e.target)) {
+      if (
+        suggestionsRef.current &&
+        !suggestionsRef.current.contains(e.target)
+      ) {
         setShowSuggestions(false);
       }
     }
@@ -104,7 +113,9 @@ export default function DeviceStep({
           Catégorie *
         </label>
         {errors.hardware_category && (
-          <p className="mb-2 text-sm text-red-600">{errors.hardware_category}</p>
+          <p className="mb-2 text-sm text-red-600">
+            {errors.hardware_category}
+          </p>
         )}
 
         <div className="space-y-4">
@@ -122,17 +133,19 @@ export default function DeviceStep({
                       updateField("hardware_category", cat);
                       setCustomCategory("");
                     }}
-                    className={`p-2.5 rounded-xl border-2 text-center transition-all text-xs sm:text-sm font-medium leading-tight
+                    className={`p-3 rounded-xl border-2 text-center transition-all text-xs sm:text-sm font-medium leading-tight flex flex-col items-center gap-2 h-24 overflow-hidden
                       ${
                         form.hardware_category === cat
                           ? "border-blue-500 bg-blue-50 text-blue-700"
                           : "border-gray-200 hover:border-gray-300 text-gray-600"
                       }`}
                   >
-                    <span className="text-lg block mb-0.5">
-                      {CATEGORY_ICONS[cat]}
+                    <span className="inline-flex items-center justify-center w-12 h-12 rounded-md bg-white/50 text-slate-600 shadow-sm">
+                      <Icon name={CATEGORY_ICONS[cat]} className="w-6 h-6" />
                     </span>
-                    {CATEGORY_LABELS[cat]}
+                    <span className="mt-2 text-sm text-center leading-tight break-words whitespace-normal">
+                      {CATEGORY_LABELS[cat]}
+                    </span>
                   </button>
                 ))}
               </div>
@@ -144,14 +157,17 @@ export default function DeviceStep({
             <button
               type="button"
               onClick={() => updateField("hardware_category", "__other__")}
-              className={`w-full p-2.5 rounded-xl border-2 text-center transition-all text-sm font-medium
+              className={`w-full p-2.5 rounded-xl border-2 text-center transition-transform transform hover:-translate-y-0.5 duration-150 text-sm font-medium
                 ${
                   isOtherCategory
                     ? "border-blue-500 bg-blue-50 text-blue-700"
                     : "border-dashed border-gray-300 hover:border-gray-400 text-gray-500"
                 }`}
             >
-              ✏️ Autre catégorie...
+              <span className="inline-flex items-center gap-2 justify-center">
+                <Icon name="pencil" className="w-4 h-4" />
+                Autre catégorie...
+              </span>
             </button>
             {isOtherCategory && (
               <input
@@ -249,15 +265,17 @@ export default function DeviceStep({
         />
         {/* Suggestions dropdown */}
         {showSuggestions && suggestions.length > 0 && (
-          <div className="absolute z-20 top-full left-0 right-0 mt-1 bg-white rounded-lg border border-gray-200 shadow-lg max-h-48 overflow-y-auto">
+          <div className="absolute z-20 top-full left-0 right-0 mt-1 bg-white rounded-lg border border-gray-200 shadow-lg max-h-48 overflow-y-auto transition-opacity duration-150">
             {suggestions.map((s, i) => (
               <button
                 key={i}
                 type="button"
                 onClick={() => pickSuggestion(s)}
-                className="w-full text-left px-3 py-2 text-sm hover:bg-blue-50 transition-colors flex items-center gap-2"
+                className="w-full text-left px-3 py-2 text-sm hover:bg-blue-50 transition-colors flex items-center gap-2 transform hover:translate-x-0.5"
               >
-                <span className="text-gray-400">🔍</span>
+                <span className="text-gray-400">
+                  <Icon name="search" className="w-4 h-4" />
+                </span>
                 <span className="font-medium text-gray-800">
                   {s.brand} {s.model}
                 </span>
@@ -272,9 +290,18 @@ export default function DeviceStep({
         <label className="block text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-2">
           Numéro de série
           <span className="text-xs text-gray-400 font-normal flex items-center gap-1">
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+            <svg
+              className="w-3.5 h-3.5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
+              />
             </svg>
             Compatible douchette
           </span>
@@ -354,10 +381,15 @@ export function ProblemStep({ form, updateField, errors, ic }) {
         <>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Type de panne * <span className="text-xs text-gray-400 font-normal">(sélection multiple)</span>
+              Type de panne *{" "}
+              <span className="text-xs text-gray-400 font-normal">
+                (sélection multiple)
+              </span>
             </label>
             {errors.problem_description && (
-              <p className="mb-2 text-sm text-red-600">{errors.problem_description}</p>
+              <p className="mb-2 text-sm text-red-600">
+                {errors.problem_description}
+              </p>
             )}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {COMPUTER_PROBLEMS.map((p) => (
@@ -424,7 +456,9 @@ export function ProblemStep({ form, updateField, errors, ic }) {
             Description de la panne *
           </label>
           {errors.problem_description && (
-            <p className="mb-2 text-sm text-red-600">{errors.problem_description}</p>
+            <p className="mb-2 text-sm text-red-600">
+              {errors.problem_description}
+            </p>
           )}
           <textarea
             value={form.problem_description}

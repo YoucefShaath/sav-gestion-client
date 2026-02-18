@@ -2,20 +2,30 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { getStats } from "@/lib/api";
+import { useAuth } from "@/components/AuthProvider";
 import StatusBadge from "@/components/StatusBadge";
 import PriorityBadge from "@/components/PriorityBadge";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { CATEGORY_ICONS, CATEGORY_LABELS, formatDate } from "@/lib/utils";
+import Icon from "@/components/Icons";
 
 export default function DashboardPage() {
+  const { user } = useAuth();
+  const router = useRouter();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    // Technicians cannot access dashboard
+    if (user && user.role !== "admin") {
+      router.replace("/tickets");
+      return;
+    }
     loadStats();
-  }, []);
+  }, [user]);
 
   async function loadStats() {
     try {
@@ -181,7 +191,10 @@ export default function DashboardPage() {
                   className="flex items-center gap-4 px-5 py-3.5 hover:bg-gray-50 transition-colors"
                 >
                   <span className="text-xl">
-                    {CATEGORY_ICONS[ticket.hardware_category] || "🔧"}
+                    <Icon
+                      name={CATEGORY_ICONS[ticket.hardware_category]}
+                      className="w-6 h-6 text-slate-600"
+                    />
                   </span>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
@@ -226,7 +239,10 @@ export default function DashboardPage() {
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-sm text-gray-700 flex items-center gap-2">
                         <span>
-                          {CATEGORY_ICONS[cat.hardware_category] || "🔧"}
+                          <Icon
+                            name={CATEGORY_ICONS[cat.hardware_category]}
+                            className="w-5 h-5 text-slate-600"
+                          />
                         </span>
                         {CATEGORY_LABELS[cat.hardware_category] ||
                           cat.hardware_category}

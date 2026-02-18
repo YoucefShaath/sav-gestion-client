@@ -3,10 +3,10 @@
  */
 import { getPublicStatus } from "./api";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+// No need for API_BASE for Next.js API routes
 
 export async function loginTechnician(username, password) {
-  const res = await fetch(`${API_BASE}/login.php`, {
+  const res = await fetch(`/api/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username, password }),
@@ -53,9 +53,7 @@ export function getUser() {
  * Lookup tickets by phone number (for user "my tickets" feature)
  */
 export async function lookupTicketsByPhone(phone) {
-  const res = await fetch(
-    `${API_BASE}/tickets.php?search=${encodeURIComponent(phone)}`,
-  );
+  const res = await fetch(`/api/tickets?search=${encodeURIComponent(phone)}`);
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Erreur");
   return data.data || data;

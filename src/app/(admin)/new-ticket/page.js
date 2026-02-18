@@ -10,6 +10,7 @@ import {
   PRIORITY_LABELS,
   validatePhone,
 } from "@/lib/utils";
+import Icon from "@/components/Icons";
 import QRCodeDisplay from "@/components/QRCodeDisplay";
 import DeviceStep, {
   ProblemStep,
@@ -352,10 +353,28 @@ export default function NewTicketPage() {
               <hr className="border-gray-200" />
               <ConfirmRow
                 label="Catégorie"
-                value={`${CATEGORY_ICONS[resolveCategory(form, customCategory)] || "🔧"} ${CATEGORY_LABELS[resolveCategory(form, customCategory)] || resolveCategory(form, customCategory)}`}
+                value={
+                  <span className="flex items-center gap-2">
+                    <Icon
+                      name={
+                        CATEGORY_ICONS[resolveCategory(form, customCategory)]
+                      }
+                      className="w-5 h-5 text-slate-600"
+                    />
+                    <span>
+                      {CATEGORY_LABELS[resolveCategory(form, customCategory)] ||
+                        resolveCategory(form, customCategory)}
+                    </span>
+                  </span>
+                }
               />
-              <ConfirmRow label="Marque" value={resolveBrand(form, customBrand) || "—"} />
-              {form.reference && <ConfirmRow label="Référence" value={form.reference} />}
+              <ConfirmRow
+                label="Marque"
+                value={resolveBrand(form, customBrand) || "—"}
+              />
+              {form.reference && (
+                <ConfirmRow label="Référence" value={form.reference} />
+              )}
               {form.model && <ConfirmRow label="Modèle" value={form.model} />}
               {form.serial_number && (
                 <ConfirmRow label="N° de série" value={form.serial_number} />

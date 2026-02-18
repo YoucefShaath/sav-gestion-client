@@ -1,6 +1,7 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/AuthProvider";
+import { ToastProvider } from "@/components/ToastProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -8,15 +9,17 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: "SAV Manager — Gestion Après-Vente",
-  description: "Système de gestion des réparations et du service après-vente",
+  title: "Informatica — Solutions informatiques",
+  description: "Gestion des réparations, services et solutions informatiques",
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="fr">
       <body className={`${inter.variable} antialiased`}>
-        <AuthProvider>{children}</AuthProvider>
+        <ToastProvider>
+          <AuthProvider>{children}</AuthProvider>
+        </ToastProvider>
       </body>
     </html>
   );

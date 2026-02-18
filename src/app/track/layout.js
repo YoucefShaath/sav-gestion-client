@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "Suivi de réparation — SAV Manager",
+  title: "Suivi de réparation — Informatica",
   description: "Suivez l'état de votre réparation en temps réel",
 };
 

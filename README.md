@@ -34,3 +34,9 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Environment variables
+
+- `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS` — configure outgoing email (nodemailer). If SMTP credentials are not set in development, the app will simulate sending and log to console.
+- `EMAIL_ON_COMPLETED` — (optional) set to `false` to disable automatic emails when a ticket status changes to **Terminé**. Defaults to enabled.
+- `NEXT_PUBLIC_APP_URL` — (optional) base URL used in links inside emails (e.g. `https://example.com`). If not set, the request origin is used.

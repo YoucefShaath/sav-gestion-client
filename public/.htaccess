@@ -1,0 +1,24 @@
+RewriteEngine On
+
+# ── Force HTTPS (uncomment on production) ──
+# RewriteCond %{HTTPS} off
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# ── API requests: pass through to PHP directly ──
+RewriteRule ^api/ - [L]
+
+# ── If the requested file or directory exists, serve it ──
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# ── Dynamic routes: rewrite /track/<anything>/ to /track/_/ ──
+RewriteRule ^track/[^/]+/?$ /track/_/index.html [L]
+
+# ── Dynamic routes: rewrite /tickets/<anything>/ to /tickets/_/ ──
+RewriteRule ^tickets/[^/]+/?$ /tickets/_/index.html [L]
+
+# ── Fallback: try adding trailing slash or serve index.html ──
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^([^.]+)$ /$1/index.html [L]

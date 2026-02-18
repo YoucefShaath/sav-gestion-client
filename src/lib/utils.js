@@ -87,12 +87,7 @@ export const CATEGORY_GROUPS = [
   {
     group: "Informatique",
     icon: "💻",
-    items: ["Laptop", "All In One", "PC Bureaux", "Serveur"],
-  },
-  {
-    group: "Autre",
-    icon: "🔧",
-    items: ["Ecran", "Reseau", "Other"],
+    items: ["Laptop", "All In One", "PC Bureaux", "Serveur", "Ecran", "Reseau"],
   },
 ];
 
@@ -113,23 +108,28 @@ export const CATEGORY_LABELS = {
 };
 
 export const CATEGORY_ICONS = {
-  "Laser Mono - Photocopieur": "🖨️",
-  "Laser Mono - MFP": "🖨️",
-  "Laser Couleur - Photocopieur": "🖨️",
-  "Laser Couleur - MFP": "🖨️",
-  "MFP Ink": "🖨️",
-  Matricielle: "🖨️",
-  Laptop: "💻",
-  "All In One": "🖥️",
-  "PC Bureaux": "🖥️",
-  Serveur: "🗄️",
-  Ecran: "🖥️",
-  Reseau: "🌐",
-  Other: "🔧",
+  "Laser Mono - Photocopieur": "printer",
+  "Laser Mono - MFP": "printer",
+  "Laser Couleur - Photocopieur": "printer",
+  "Laser Couleur - MFP": "printer",
+  "MFP Ink": "printer",
+  Matricielle: "printer",
+  Laptop: "laptop",
+  "All In One": "laptop",
+  "PC Bureaux": "laptop",
+  Serveur: "server",
+  Ecran: "laptop",
+  Reseau: "server",
+  Other: "wrench",
 };
 
 /** Categories that count as "computer" for the problem picker */
-export const COMPUTER_CATEGORIES = ["Laptop", "All In One", "PC Bureaux", "Serveur"];
+export const COMPUTER_CATEGORIES = [
+  "Laptop",
+  "All In One",
+  "PC Bureaux",
+  "Serveur",
+];
 
 export const COMPUTER_PROBLEMS = [
   "Disques durs (HDD / SSD)",
@@ -162,7 +162,7 @@ export const BRANDS = [
 
 export const TRANSITIONS = {
   Received: ["Diagnostic"],
-  Diagnostic: ["In Progress", "Received"],
+  Diagnostic: ["In Progress", "Received", "Completed"],
   "In Progress": ["Completed", "Diagnostic"],
   Completed: ["Delivered", "In Progress"],
   Delivered: [],

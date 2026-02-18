@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { loginTechnician } from "@/lib/auth";
 import { useAuth } from "@/components/AuthProvider";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -27,7 +28,7 @@ export default function LoginPage() {
     try {
       const data = await loginTechnician(username, password);
       login(data.user);
-      router.replace("/dashboard");
+      router.replace(data.user.role === "admin" ? "/dashboard" : "/tickets");
     } catch (err) {
       setError(err.message);
     } finally {
@@ -63,8 +64,8 @@ export default function LoginPage() {
         <div className="bg-white rounded-2xl shadow-2xl p-8">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="w-14 h-14 rounded-xl bg-blue-600 flex items-center justify-center font-bold text-2xl text-white mx-auto mb-4">
-              S
+            <div className="h-full w-48 rounded-xl bg-blue-600 flex items-center justify-center font-bold text-2xl text-white mx-auto mb-4">
+              <Image src="/informatica.jpg" alt="Informatica Logo" width={200} height={200} className="w-48 h-auto rounded border-2 border-blue-500" />
             </div>
             <h1 className="text-2xl font-bold text-gray-900">
               Espace Technicien
@@ -129,7 +130,7 @@ export default function LoginPage() {
         </div>
 
         <p className="text-center text-xs text-blue-400/40 mt-6">
-          SAV Manager v1.0
+          Informatica v1.0
         </p>
       </div>
     </div>

@@ -5,6 +5,7 @@ import { getArchives } from "@/lib/api";
 import StatusBadge from "@/components/StatusBadge";
 import PriorityBadge from "@/components/PriorityBadge";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import Icon from "@/components/Icons";
 import EmptyState from "@/components/EmptyState";
 import {
   CATEGORY_ICONS,
@@ -117,7 +118,10 @@ export default function ArchivesPage() {
                     <div className="flex items-start justify-between">
                       <div className="flex items-start gap-3 min-w-0">
                         <span className="text-xl mt-0.5">
-                          {CATEGORY_ICONS[a.hardware_category]}
+                          <Icon
+                            name={CATEGORY_ICONS[a.hardware_category]}
+                            className="w-6 h-6 text-slate-600"
+                          />
                         </span>
                         <div className="min-w-0">
                           <div className="flex items-center gap-2">

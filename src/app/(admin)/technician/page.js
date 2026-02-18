@@ -5,6 +5,7 @@ import { getTickets, updateTicketStatus } from "@/lib/api";
 import StatusBadge from "@/components/StatusBadge";
 import PriorityBadge from "@/components/PriorityBadge";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import Icon from "@/components/Icons";
 import {
   STATUS_LABELS,
   STATUS_COLORS,
@@ -14,6 +15,7 @@ import {
   TRANSITIONS,
   formatDate,
 } from "@/lib/utils";
+import { useToast } from "@/components/ToastProvider";
 
 export default function TechnicianPage() {
   const [tickets, setTickets] = useState([]);
@@ -21,6 +23,8 @@ export default function TechnicianPage() {
   const [activeFilter, setActiveFilter] = useState("");
   const [updating, setUpdating] = useState(null);
   const [expandedId, setExpandedId] = useState(null);
+
+  const showToast = useToast();
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -46,7 +50,7 @@ export default function TechnicianPage() {
       await updateTicketStatus(ticketId, { status: newStatus, ...extraData });
       load();
     } catch (err) {
-      alert(err.data?.error || err.message);
+      showToast({ type: "error", message: err.data?.error || err.message });
     } finally {
       setUpdating(null);
     }
@@ -121,7 +125,10 @@ export default function TechnicianPage() {
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-3 min-w-0">
                       <span className="text-2xl mt-0.5">
-                        {CATEGORY_ICONS[t.hardware_category]}
+                        <Icon
+                          name={CATEGORY_ICONS[t.hardware_category]}
+                          className="w-6 h-6 text-slate-600"
+                        />
                       </span>
                       <div className="min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">

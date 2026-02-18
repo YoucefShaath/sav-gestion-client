@@ -16,6 +16,8 @@ import {
   CATEGORY_ICONS,
   formatDate,
 } from "@/lib/utils";
+import Icon from "@/components/Icons";
+import { useToast, useConfirm } from "@/components/ToastProvider";
 
 export default function TicketsPageWrapper() {
   return (
@@ -38,6 +40,9 @@ function TicketsPage() {
   );
   const [filterCategory, setFilterCategory] = useState("");
   const [search, setSearch] = useState("");
+
+  const showToast = useToast();
+  const confirm = useConfirm();
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -63,22 +68,47 @@ function TicketsPage() {
   }, [load]);
 
   async function handleDelete(id) {
-    if (!confirm(`Supprimer le ticket ${id} ?`)) return;
+    if (
+      !(await confirm({
+        title: "Supprimer le ticket",
+        message: `Supprimer le ticket ${id} ?`,
+        confirmText: "Supprimer",
+        cancelText: "Annuler",
+        danger: true,
+      }))
+    )
+      return;
     try {
       await deleteTicket(id);
+      showToast({ type: "success", message: `Ticket ${id} supprimé.` });
       load();
     } catch (err) {
-      alert(err.message);
+      showToast({
+        type: "error",
+        message: err.message || "Erreur lors de la suppression",
+      });
     }
   }
 
   async function handleArchive(id) {
-    if (!confirm(`Archiver le ticket ${id} ?`)) return;
+    if (
+      !(await confirm({
+        title: "Archiver le ticket",
+        message: `Archiver le ticket ${id} ?`,
+        confirmText: "Archiver",
+        cancelText: "Annuler",
+      }))
+    )
+      return;
     try {
       await archiveTicket(id);
+      showToast({ type: "success", message: `Ticket ${id} archivé.` });
       load();
     } catch (err) {
-      alert(err.message);
+      showToast({
+        type: "error",
+        message: err.message || "Erreur lors de l'archivage",
+      });
     }
   }
 
@@ -237,7 +267,12 @@ function TicketsPage() {
                     </td>
                     <td className="px-5 py-3.5">
                       <span className="text-sm text-gray-700 flex items-center gap-1.5">
-                        <span>{CATEGORY_ICONS[t.hardware_category]}</span>
+                        <span className="text-slate-600">
+                          <Icon
+                            name={CATEGORY_ICONS[t.hardware_category]}
+                            className="w-5 h-5"
+                          />
+                        </span>
                         {t.brand || CATEGORY_LABELS[t.hardware_category]}
                         {t.model && (
                           <span className="text-gray-400">· {t.model}</span>
@@ -348,9 +383,14 @@ function TicketsPage() {
                   <StatusBadge status={t.status} />
                 </div>
                 <div className="flex items-center justify-between text-xs text-gray-500">
-                  <span className="flex items-center gap-1">
-                    {CATEGORY_ICONS[t.hardware_category]}{" "}
-                    {t.brand || CATEGORY_LABELS[t.hardware_category]}
+                  <span className="flex items-center gap-2">
+                    <Icon
+                      name={CATEGORY_ICONS[t.hardware_category]}
+                      className="w-5 h-5 text-slate-600"
+                    />
+                    <span className="truncate">
+                      {t.brand || CATEGORY_LABELS[t.hardware_category]}
+                    </span>
                   </span>
                   <PriorityBadge priority={t.priority} />
                 </div>

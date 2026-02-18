@@ -6,6 +6,7 @@ import StatusBadge from "@/components/StatusBadge";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import EmptyState from "@/components/EmptyState";
 import { CATEGORY_ICONS, CATEGORY_LABELS, formatDate } from "@/lib/utils";
+import Icon from "@/components/Icons";
 import Link from "next/link";
 
 export default function MyTicketsPage() {
@@ -126,7 +127,10 @@ export default function MyTicketsPage() {
                     <StatusBadge status={ticket.status} />
                   </div>
                   <div className="flex items-center gap-2 text-sm text-gray-600 mt-1">
-                    <span>{CATEGORY_ICONS[ticket.hardware_category]}</span>
+                    <Icon
+                      name={CATEGORY_ICONS[ticket.hardware_category]}
+                      className="w-5 h-5 text-slate-600"
+                    />
                     <span>{CATEGORY_LABELS[ticket.hardware_category]}</span>
                     {ticket.brand && (
                       <span className="text-gray-400">

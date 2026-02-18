@@ -13,9 +13,11 @@ export default function StatusBadge({ status, size = "sm" }) {
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full font-semibold ${colors.bg} ${colors.text} ${sizeClasses}`}
+      className={`inline-flex items-center gap-1.5 rounded-full font-semibold ${colors.bg} ${colors.text} ${sizeClasses} transition-colors duration-300`}
     >
-      <span className={`w-1.5 h-1.5 rounded-full ${colors.dot}`} />
+      <span
+        className={`w-1.5 h-1.5 rounded-full ${colors.dot} transform transition-transform duration-300`}
+      ></span>
       {label}
     </span>
   );

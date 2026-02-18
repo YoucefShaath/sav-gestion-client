@@ -3,11 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createTicket } from "@/lib/api";
-import {
-  CATEGORY_LABELS,
-  CATEGORY_ICONS,
-  validatePhone,
-} from "@/lib/utils";
+import Icon from "@/components/Icons";
+import { CATEGORY_LABELS, CATEGORY_ICONS, validatePhone } from "@/lib/utils";
 import QRCodeDisplay from "@/components/QRCodeDisplay";
 import DeviceStep, {
   ProblemStep,
@@ -121,14 +118,28 @@ export default function UserNewTicketPage() {
       <div className="max-w-lg mx-auto">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center">
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            <svg
+              className="w-8 h-8 text-green-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+              />
             </svg>
           </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Ticket créé avec succès !</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">
+            Ticket créé avec succès !
+          </h2>
           <p className="text-gray-500 mb-6">
             Le ticket{" "}
-            <span className="font-mono font-semibold text-blue-600">{created.ticket_id}</span>{" "}
+            <span className="font-mono font-semibold text-blue-600">
+              {created.ticket_id}
+            </span>{" "}
             a été enregistré.
           </p>
           <QRCodeDisplay ticketId={created.ticket_id} size={160} />
@@ -172,7 +183,10 @@ export default function UserNewTicketPage() {
       {/* Step Indicator */}
       <div className="flex items-center mb-8">
         {STEPS.map((s, i) => (
-          <div key={s.id} className="flex items-center flex-1 last:flex-initial">
+          <div
+            key={s.id}
+            className="flex items-center flex-1 last:flex-initial"
+          >
             <div className="flex flex-col items-center">
               <div
                 className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all
@@ -184,7 +198,7 @@ export default function UserNewTicketPage() {
                       : "bg-gray-100 border-gray-300 text-gray-400"
                 }`}
               >
-                {step > s.id ? "✓" : s.id}
+                {step > s.id ? <Icon name="check" className="w-4 h-4" /> : s.id}
               </div>
               <span
                 className={`mt-1.5 text-[11px] font-medium hidden sm:block ${step >= s.id ? "text-blue-600" : "text-gray-400"}`}
@@ -193,7 +207,9 @@ export default function UserNewTicketPage() {
               </span>
             </div>
             {i < STEPS.length - 1 && (
-              <div className={`flex-1 h-0.5 mx-2 ${step > s.id ? "bg-blue-500" : "bg-gray-200"}`} />
+              <div
+                className={`flex-1 h-0.5 mx-2 ${step > s.id ? "bg-blue-500" : "bg-gray-200"}`}
+              />
             )}
           </div>
         ))}
@@ -275,14 +291,26 @@ export default function UserNewTicketPage() {
             <div className="bg-gray-50 rounded-xl p-5 space-y-4">
               <CR label="Client" value={form.client_name} />
               <CR label="Téléphone" value={form.client_phone} />
-              {form.client_email && <CR label="Email" value={form.client_email} />}
+              {form.client_email && (
+                <CR label="Email" value={form.client_email} />
+              )}
               <hr className="border-gray-200" />
               <CR
                 label="Catégorie"
-                value={`${CATEGORY_ICONS[resolvedCat] || "🔧"} ${CATEGORY_LABELS[resolvedCat] || resolvedCat}`}
+                value={
+                  <span className="flex items-center gap-2">
+                    <Icon
+                      name={CATEGORY_ICONS[resolvedCat]}
+                      className="w-5 h-5 text-slate-600"
+                    />
+                    <span>{CATEGORY_LABELS[resolvedCat] || resolvedCat}</span>
+                  </span>
+                }
               />
               <CR label="Marque" value={resolvedBrand || "—"} />
-              {form.reference && <CR label="Référence" value={form.reference} />}
+              {form.reference && (
+                <CR label="Référence" value={form.reference} />
+              )}
               {form.model && <CR label="Modèle" value={form.model} />}
               {form.serial_number && (
                 <CR label="N° de série" value={form.serial_number} />
