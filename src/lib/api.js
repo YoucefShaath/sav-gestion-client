@@ -101,3 +101,17 @@ export async function getModelSuggestions(query, category = "") {
   if (category) params.set("category", category);
   return request(`suggestions?${params.toString()}`);
 }
+
+// ── Demandes (Entreprise form) ─────────────────────────────
+export async function createDemande(data) {
+  return request("demande", { method: "POST", body: JSON.stringify(data) });
+}
+
+export async function getDemandes(params = {}) {
+  const query = new URLSearchParams(params).toString();
+  return request(`demande${query ? `?${query}` : ""}`);
+}
+
+export async function deleteDemande(id) {
+  return request(`demande?id=${encodeURIComponent(id)}`, { method: "DELETE" });
+}

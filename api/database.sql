@@ -1,8 +1,6 @@
 -- SAV Management System Database Schema
 -- Run this SQL on your MySQL server to create the database
 
-CREATE DATABASE IF NOT EXISTS sav_gestion CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE sav_gestion;
 
 -- Main tickets table
 CREATE TABLE IF NOT EXISTS tickets (
@@ -69,4 +67,18 @@ CREATE TABLE IF NOT EXISTS status_history (
     changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     notes TEXT DEFAULT NULL,
     INDEX idx_ticket_id (ticket_id)
+) ENGINE=InnoDB;
+
+-- Demandes from Entreprise form (achat / prestation)
+CREATE TABLE IF NOT EXISTS demandes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    type ENUM('achat','prestation') NOT NULL,
+    company_name VARCHAR(200) NOT NULL,
+    contact_phone VARCHAR(50) NOT NULL,
+    contact_email VARCHAR(200) DEFAULT NULL,
+    description TEXT NOT NULL,
+    urgency VARCHAR(20) DEFAULT 'normal',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_type (type),
+    INDEX idx_created_at (created_at)
 ) ENGINE=InnoDB;

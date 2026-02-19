@@ -10,6 +10,7 @@ import {
   FiPlusCircle,
   FiTool,
   FiArchive,
+  FiMail,
   FiChevronLeft,
   FiChevronRight,
   FiLogOut,
@@ -27,6 +28,7 @@ const NAV_ITEMS = [
   { href: "/new-ticket", label: "Nouveau ticket", icon: FiPlusCircle },
   { href: "/technician", label: "Vue technicien", icon: FiTool },
   { href: "/archives", label: "Archives", icon: FiArchive },
+  { href: "/demandes", label: "Demandes", icon: FiMail, adminOnly: true },
 ];
 
 export default function Sidebar() {

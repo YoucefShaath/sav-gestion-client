@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import Icon from "@/components/Icons";
+import Footer from "@/components/Footer";
+import { useToast } from "@/components/ToastProvider";
 
 // No need for API_BASE for Next.js API routes
 
@@ -76,6 +78,9 @@ export default function EntreprisePage() {
     setStep((s) => Math.max(s - 1, 1));
   }
 
+  const [savedId, setSavedId] = useState(null);
+  const showToast = useToast();
+
   async function handleSubmit() {
     if (!validate(3)) {
       setStep(3);
@@ -90,6 +95,7 @@ export default function EntreprisePage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Erreur lors de l'envoi");
+      setSavedId(data.id || null);
       setStep(5);
     } catch (err) {
       setErrors({ submit: err.message });
@@ -127,6 +133,27 @@ export default function EntreprisePage() {
             équipe. Nous vous contacterons dans les plus brefs délais à
             l&apos;adresse <strong>{form.contact_email}</strong>.
           </p>
+          {savedId && (
+            <div className="mb-4 text-sm text-gray-600">
+              Référence de la demande: <strong>#{savedId}</strong>
+              <button
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(String(savedId));
+                    showToast({ type: "success", message: "Référence copiée" });
+                  } catch (e) {
+                    showToast({
+                      type: "error",
+                      message: "Impossible de copier",
+                    });
+                  }
+                }}
+                className="ml-3 px-2 py-1 text-xs bg-gray-100 rounded"
+              >
+                Copier
+              </button>
+            </div>
+          )}
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link
               href="/"
@@ -408,19 +435,8 @@ export default function EntreprisePage() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-200 py-6 px-4 mt-8">
-        <div className="max-w-3xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-400">
-          <div className="flex items-center gap-2">
-            <span>📧 contact@informaticacompany.com</span>
-            <span className="hidden sm:inline">•</span>
-            <span>📞 0793 27 23 79</span>
-          </div>
-          <div className="text-center sm:text-right">
-            12, chemin Sidi Yahia, locale 14, Bir Mourad Raïs, Alger, Algérie
-          </div>
-        </div>
-      </footer>
+      {/* Footer (shared) */}
+      <Footer />
     </div>
   );
 }

@@ -30,6 +30,11 @@ INSERT INTO status_history (ticket_id, old_status, new_status, changed_at, notes
 ('SAV-300101-0005',NULL,'Received','2026-01-28 09:15:00','Ticket créé'),
 ('SAV-300101-0005','Completed','Delivered','2026-02-06 16:00:00','Client a récupéré le matériel');
 
+-- Sample demandes (Entreprise form submissions)
+INSERT INTO demandes (type, company_name, contact_phone, contact_email, description, urgency, created_at) VALUES
+('achat', 'Sarl TekPlus', '0555123456', 'contact@tekplus.dz', 'Demande d\'achat: 5 postes Dell Inspiron + 2 imprimantes', 'moyenne', '2026-02-10 09:30:00'),
+('prestation', 'Axiom Services', '0660778899', 'ops@axiom.dz', 'Prestation: audit réseau et déploiement VLAN', 'urgente', '2026-02-12 14:15:00');
+
 -- ── Archived Tickets (old ones) ─────────────────────────────
 
 INSERT INTO archives (ticket_id, client_name, client_phone, client_email, hardware_category, brand, model, serial_number, problem_description, diagnostic_notes, technician_notes, status, location, estimated_cost, final_cost, priority, created_at, updated_at, delivered_at, archived_at) VALUES

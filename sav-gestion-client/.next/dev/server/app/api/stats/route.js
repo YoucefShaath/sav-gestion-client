@@ -1,0 +1,10 @@
+var R=require("../../../chunks/[turbopack]_runtime.js")("server/app/api/stats/route.js")
+R.c("server/chunks/18f6e_next_dist_fcc8da81._.js")
+R.c("server/chunks/18f6e_mysql2_b1242799._.js")
+R.c("server/chunks/18f6e_iconv-lite_cd9c9047._.js")
+R.c("server/chunks/18f6e_aws-ssl-profiles_lib_68409385._.js")
+R.c("server/chunks/18f6e_79b41225._.js")
+R.c("server/chunks/[root-of-the-server]__c8097918._.js")
+R.c("server/chunks/sav-gestion-client__next-internal_server_app_api_stats_route_actions_e5a697f6.js")
+R.m("[project]/sav-gestion-client/node_modules/next/dist/esm/build/templates/app-route.js { INNER_APP_ROUTE => \"[project]/sav-gestion-client/src/app/api/stats/route.js [app-route] (ecmascript)\" } [app-route] (ecmascript)")
+module.exports=R.m("[project]/sav-gestion-client/node_modules/next/dist/esm/build/templates/app-route.js { INNER_APP_ROUTE => \"[project]/sav-gestion-client/src/app/api/stats/route.js [app-route] (ecmascript)\" } [app-route] (ecmascript)").exports

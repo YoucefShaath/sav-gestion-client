@@ -4,6 +4,7 @@ import { formatDate, CATEGORY_LABELS } from "@/lib/utils";
 export function renderInvoiceHtml(
   ticket,
   baseUrl = process.env.NEXT_PUBLIC_APP_URL || `http://localhost:3000`,
+  logoSrc, // optional override (e.g. `cid:logo@informaticacompany.com`)
 ) {
   const invoiceNumber = `FAC-${(ticket.ticket_id || "").replace("SAV-", "")}`;
   const today = new Date().toLocaleDateString("fr-FR", {
@@ -18,7 +19,7 @@ export function renderInvoiceHtml(
   const tva = total * 0.19;
   const totalTTC = total + tva;
 
-  const logoUrl = `${baseUrl.replace(/\/$/, "")}/logo.jpg`;
+  const logoUrl = logoSrc || `${baseUrl.replace(/\/$/, "")}/logo.jpg`;
 
   return `<!doctype html>
   <html lang="fr">
@@ -49,7 +50,7 @@ export function renderInvoiceHtml(
       <div class="invoice">
         <div class="header">
           <div style="display:flex;gap:16px;align-items:center">
-            <img src="${logoUrl}" alt="logo" style="height:80px;object-fit:contain" />
+            <img src="${logoUrl}" alt="logo" style="height:120px;margin-right:16px;object-fit:contain" />
             <div class="company">
               <strong style="color:#111827;display:block">Informatica Company</strong>
               12, chemin Sidi Yahia, locale 14<br/>Bir Mourad Raïs, Alger<br/>0793 27 23 79<br/>contact@informaticacompany.com

@@ -19,15 +19,31 @@ async function run() {
     multipleStatements: true,
   });
   try {
-    console.log("Clearing tables: status_history, archives, tickets");
+    console.log("Clearing tables: status_history, archives, tickets, demandes");
     await conn.query("SET FOREIGN_KEY_CHECKS = 0");
+
+    // Ensure 'demandes' table exists (backwards-compatible with older DBs)
+    await conn.query(`CREATE TABLE IF NOT EXISTS demandes (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      type ENUM('achat','prestation') NOT NULL,
+      company_name VARCHAR(200) NOT NULL,
+      contact_phone VARCHAR(50) NOT NULL,
+      contact_email VARCHAR(200) DEFAULT NULL,
+      description TEXT NOT NULL,
+      urgency VARCHAR(20) DEFAULT 'normal',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      INDEX idx_type (type),
+      INDEX idx_created_at (created_at)
+    ) ENGINE=InnoDB;`);
+
     await conn.query("TRUNCATE TABLE status_history");
     await conn.query("TRUNCATE TABLE archives");
     await conn.query("TRUNCATE TABLE tickets");
+    await conn.query("TRUNCATE TABLE demandes");
     await conn.query("SET FOREIGN_KEY_CHECKS = 1");
 
     console.log(
-      "Inserting new seed records (tickets, archives, status_history)",
+      "Inserting new seed records (tickets, archives, status_history, demandes)",
     );
 
     // Tickets
@@ -230,6 +246,35 @@ async function run() {
       await conn.query(
         `INSERT INTO status_history (ticket_id, old_status, new_status, changed_at, notes) VALUES (?, ?, ?, ?, ?)`,
         h,
+      );
+    }
+
+    // Sample demandes
+    const demandes = [
+      [
+        "achat",
+        "Sarl TekPlus",
+        "0555123456",
+        "contact@tekplus.dz",
+        "Demande d'achat: 5 postes Dell Inspiron + 2 imprimantes",
+        "moyenne",
+        "2026-02-10 09:30:00",
+      ],
+      [
+        "prestation",
+        "Axiom Services",
+        "0660778899",
+        "ops@axiom.dz",
+        "Prestation: audit réseau et déploiement VLAN",
+        "urgente",
+        "2026-02-12 14:15:00",
+      ],
+    ];
+
+    for (const d of demandes) {
+      await conn.query(
+        `INSERT INTO demandes (type, company_name, contact_phone, contact_email, description, urgency, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        d,
       );
     }
 

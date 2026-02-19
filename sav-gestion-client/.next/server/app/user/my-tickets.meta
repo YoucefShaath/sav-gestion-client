@@ -1,0 +1,16 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/user/layout,_N_T_/user/my-tickets/layout,_N_T_/user/my-tickets/page,_N_T_/user/my-tickets"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/user/my-tickets/__PAGE__",
+    "/user/my-tickets",
+    "/user",
+    "/_index",
+    "/_head"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "sav-gestion-client/php-api",
+  "description": "Lightweight PHP API for sav-gestion-client",
+  "require": {
+    "php": ">=7.4",
+    "phpmailer/phpmailer": "^6.8"
+  },
+  "autoload": {
+    "psr-4": {
+      "App\\": "src/"
+    }
+  }
+}

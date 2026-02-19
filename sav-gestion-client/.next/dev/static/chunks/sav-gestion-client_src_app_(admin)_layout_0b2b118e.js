@@ -1,0 +1,7 @@
+(globalThis.TURBOPACK_CHUNK_LISTS || (globalThis.TURBOPACK_CHUNK_LISTS = [])).push({
+    script: typeof document === "object" ? document.currentScript : undefined,
+    chunks: [
+  "static/chunks/sav-gestion-client_b1fbb891._.js"
+],
+    source: "dynamic"
+});

@@ -1,0 +1,13 @@
+[00:00:01.120] Server  LOG     ✓ Ready in 720ms
+[00:00:06.807] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:08.927] Server  ERROR   ⨯ AggregateError
+[00:00:08.946] Server  ERROR   ⨯ AggregateError
+[00:16:04.925] Server  ERROR   ⨯ AggregateError
+[00:16:30.761] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:36.152] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:37.359] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:38.431] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:55.491] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:55.606] Server  ERROR   ⨯ AggregateError
+[00:16:55.642] Server  ERROR   ⨯ AggregateError
+[00:17:00.171] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold

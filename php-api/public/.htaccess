@@ -1,0 +1,28 @@
+# php-api/public/.htaccess — useful for XAMPP / Apache
+
+# - uncomment and update SetEnv values or set variables in your VirtualHost
+
+# - ensures /api/\* routes are handled by public/index.php
+
+# Example SetEnv (uncomment + edit to match your environment)
+
+#SetEnv DB_HOST 127.0.0.1
+#SetEnv DB_PORT 3306
+#SetEnv DB_NAME sav_gestion
+#SetEnv DB_USER root
+#SetEnv DB_PASS ""
+#SetEnv SMTP_FROM noreply@informaticacompany.com
+#SetEnv SMTP_HOST smtp.example.com
+#SetEnv SMTP_USER your-smtp-user
+#SetEnv SMTP_PASS your-smtp-pass
+#SetEnv SMTP_PORT 465
+#SetEnv SMTP_SECURE true
+#SetEnv APP_URL http://localhost
+
+RewriteEngine On
+RewriteBase /
+
+# Route all /api/\* to index.php router
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^api/(.\*)$ index.php [L,QSA]

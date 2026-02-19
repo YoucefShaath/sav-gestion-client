@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import path from "path";
 
 let transporter;
 
@@ -18,6 +19,34 @@ function getTransporter() {
 }
 
 export async function sendMail({ to, subject, html, attachments } = {}) {
+  // normalize attachments array so we can add the inline logo when needed
+  attachments = attachments ? [...attachments] : [];
+
+  // If the HTML references the local `/logo.jpg` or the cid, replace with cid and
+  // ensure an inline attachment is included so email clients render the image.
+  const logoCid = "logo@informaticacompany.com";
+  if (typeof html === "string") {
+    // replace occurrences of src="/logo.jpg" with cid reference
+    html = html.replace(
+      /src=(?:"|')\/logo\.jpg(?:"|')/g,
+      `src=\"cid:${logoCid}\"`,
+    );
+
+    // if HTML contains the cid (or original `/logo.jpg`) and there's no logo attachment, add it
+    if (
+      (html.includes(`cid:${logoCid}`) || html.includes("/logo.jpg")) &&
+      !attachments.some(
+        (a) => a && (a.cid === logoCid || a.filename === "logo.jpg"),
+      )
+    ) {
+      attachments.push({
+        filename: "logo.jpg",
+        path: path.join(process.cwd(), "public", "logo.jpg"),
+        cid: logoCid,
+      });
+    }
+  }
+
   // Dev fallback: if SMTP not configured, don't fail — simulate success so local testing works.
   if (
     process.env.NODE_ENV !== "production" &&
@@ -41,7 +70,7 @@ export async function sendMail({ to, subject, html, attachments } = {}) {
       subject,
       html,
     };
-    if (attachments) mailOptions.attachments = attachments;
+    if (attachments.length) mailOptions.attachments = attachments;
 
     const info = await t.sendMail(mailOptions);
     return { success: true, messageId: info.messageId };

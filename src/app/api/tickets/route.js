@@ -2,6 +2,7 @@ import pool from "@/lib/db";
 import { TRANSITIONS, STATUS_LABELS } from "@/lib/utils";
 import { sendMail } from "@/lib/mail";
 import { renderInvoiceHtml } from "@/lib/invoice";
+import path from "path";
 
 export async function GET(req) {
   const url = new URL(req.url, "http://localhost");
@@ -279,29 +280,31 @@ export async function PATCH(req) {
         const trackUrl = `${origin.replace(/\/$/, "")}/track/${ticket.ticket_id}`;
         const subject = `Votre réparation (${ticket.ticket_id}) est prête`;
 
-        // Render invoice HTML on the server and include it in the email body
-        const invoiceHtml = renderInvoiceHtml(ticket, origin);
+        // Embed logo as inline attachment (CID) so email clients render it reliably
+        const logoCid = "logo@informaticacompany.com";
+        const invoiceHtml = renderInvoiceHtml(ticket, origin, `cid:${logoCid}`);
 
         const preamble = `<p>Bonjour ${ticket.client_name || "client"},</p>
           <p>Votre appareil pris en charge sous le numéro <strong>${ticket.ticket_id}</strong> est désormais <strong>terminé</strong>. Vous trouverez ci-dessous la facture correspondante et vous pouvez également la consulter en ligne : <a href="${trackUrl}">${trackUrl}</a></p>`;
 
         const combinedHtml = preamble + invoiceHtml;
 
-        // Attach the same invoice HTML so the client can download it easily from the message
-        const invoiceFilename = `FAC-${(ticket.ticket_id || "").replace("SAV-", "")}.html`;
+        // Do NOT attach the invoice HTML file — include invoice in the email body only.
+        // Still attach the logo as an inline CID so it displays in mail clients.
+        const logoPath = path.join(process.cwd(), "public", "logo.jpg");
         const result = await sendMail({
           to: ticket.client_email,
           subject,
           html: combinedHtml,
           attachments: [
             {
-              filename: invoiceFilename,
-              content: invoiceHtml,
-              contentType: "text/html",
+              filename: "logo.jpg",
+              path: logoPath,
+              cid: logoCid,
             },
           ],
         });
-        console.log("Status-change email (with invoice) result:", result);
+        console.log("Status-change email result:", result);
       } catch (err) {
         console.error("Failed to send completion email:", err);
       }
