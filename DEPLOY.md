@@ -111,7 +111,7 @@ Puis relancez `npm run build`.
 
 1. Visitez `https://votre-domaine.com/` → Page d'accueil avec 3 options
 2. Testez `https://votre-domaine.com/api/stats.php` → Doit retourner du JSON
-3. Testez la connexion technicien (admin / admin123)
+3. Testez la connexion technicien (admin / admin123) — **change this password immediately after first login**
 4. Créez un ticket et vérifiez le suivi
 
 ---
@@ -120,6 +120,27 @@ Puis relancez `npm run build`.
 
 Les emails sont envoyés via la fonction PHP `mail()`.
 Sur cPanel, cette fonction est généralement activée par défaut.
+
+### .htaccess / SetEnv snippet (cPanel)
+
+Add the following lines to `public_html/api/.htaccess` (replace values):
+
+```
+<IfModule mod_env.c>
+  SetEnv DB_HOST localhost
+  SetEnv DB_NAME your_cpanel_db_name
+  SetEnv DB_USER your_cpanel_db_user
+  SetEnv DB_PASS your_db_password
+  SetEnv APP_URL https://informaticacompany.com
+  # Optional SMTP settings for PHPMailer
+  # SetEnv SMTP_HOST smtp.example.com
+  # SetEnv SMTP_USER smtp-user
+  # SetEnv SMTP_PASS smtp-pass
+  # SetEnv SMTP_PORT 587
+</IfModule>
+```
+
+This ensures the PHP API reads DB credentials via `getenv()` (no code change required).
 
 Les destinataires configurés :
 

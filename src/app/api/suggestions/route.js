@@ -1,6 +1,8 @@
 import pool from "@/lib/db";
 import { NextResponse } from "next/server";
 
+export const dynamic = "force-static";
+
 // Dev fallback for suggestions (model / brand)
 export async function GET(req) {
   if (process.env.NODE_ENV === "production")

@@ -23,7 +23,10 @@ export async function loginTechnician(username, password) {
   }
 
   if (!res.ok) {
-    const message = (data && (data.error || data.message)) || text || `Erreur de connexion (${res.status})`;
+    const message =
+      (data && (data.error || data.message)) ||
+      text ||
+      `Erreur de connexion (${res.status})`;
     throw new Error(message);
   }
 
@@ -78,7 +81,12 @@ export async function lookupTicketsByPhone(phone) {
     // ignore — we'll use text for errors
   }
 
-  if (!res.ok) throw new Error((data && (data.error || data.message)) || text || `Erreur (${res.status})`);
+  if (!res.ok)
+    throw new Error(
+      (data && (data.error || data.message)) ||
+        text ||
+        `Erreur (${res.status})`,
+    );
   return data?.data || data;
 }
 

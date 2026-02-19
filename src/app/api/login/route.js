@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 
+export const dynamic = "force-static";
+
 // Lightweight fallback for local dev: mirror php-api/api/login.php behaviour
 const USERS = [
   {

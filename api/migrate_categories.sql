@@ -1,7 +1,5 @@
 -- Migration: Update categories from old ENUM to VARCHAR for flexibility
--- Run this on your sav_gestion database
-
-USE sav_gestion;
+-- Import into the database you have selected in phpMyAdmin (removed explicit USE)
 
 -- Change hardware_category from ENUM to VARCHAR in tickets table
 ALTER TABLE tickets MODIFY COLUMN hardware_category VARCHAR(80) NOT NULL;

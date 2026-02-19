@@ -12,7 +12,7 @@ export default function Footer() {
             className="group inline-flex items-center gap-3"
           >
             <FiPhone className="w-5 h-5 text-emerald-600 group-hover:text-emerald-700 transition-colors" />
-            <span className="text-slate-400 group-hover:text-slate-800 transition-colors">
+            <span className="text-slate-400 group-hover:text-white transition-colors">
               0793 27 23 79
             </span>
           </a>
@@ -22,7 +22,7 @@ export default function Footer() {
             className="group inline-flex items-center gap-3"
           >
             <FiMail className="w-5 h-5 text-sky-600 group-hover:text-sky-700 transition-colors" />
-            <span className="text-slate-400 group-hover:text-slate-800 transition-colors">
+            <span className="text-slate-400 group-hover:text-white transition-colors">
               contact@informaticacompany.com
             </span>
           </a>

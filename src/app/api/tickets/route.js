@@ -1,5 +1,10 @@
 import pool from "@/lib/db";
 import { NextResponse } from "next/server";
+import { sendMail } from "@/lib/mail";
+import { renderInvoiceHtml } from "@/lib/invoice";
+import path from "path";
+
+export const dynamic = "force-static";
 
 // Dev-only fallback for tickets (list + detail) — mirrors php-api/api/tickets.php GET behavior
 export async function GET(req) {
@@ -339,7 +344,51 @@ export async function PATCH(req) {
     );
     await conn.commit();
 
-    // Dev fallback: do NOT send email here (php-api is canonical for outgoing mail)
+    // If moved to Completed, send the client an email (dev mirrors php-api behavior).
+    // Uses server-side `renderInvoiceHtml` + `sendMail` (sendMail simulates send in dev when SMTP not configured).
+    if (
+      newStatus === "Completed" &&
+      row.client_email &&
+      process.env.EMAIL_ON_COMPLETED !== "false"
+    ) {
+      try {
+        const [[ticketForEmail]] = await conn.query(
+          "SELECT * FROM tickets WHERE ticket_id = ?",
+          [id],
+        );
+        const origin =
+          process.env.NEXT_PUBLIC_APP_URL ||
+          process.env.APP_URL ||
+          "http://localhost:3000";
+        const trackUrl = `${origin.replace(/\/$/, "")}/track/${ticketForEmail.ticket_id}`;
+        const subject = `Votre réparation (${ticketForEmail.ticket_id}) est prête`;
+        const logoCid = "logo@informaticacompany.com";
+
+        const invoiceHtml = renderInvoiceHtml(
+          ticketForEmail,
+          origin,
+          `cid:${logoCid}`,
+        );
+        const preamble = `<p>Bonjour ${ticketForEmail.client_name || "client"},</p><p>Votre appareil pris en charge sous le numéro <strong>${ticketForEmail.ticket_id}</strong> est désormais <strong>terminé</strong>. Vous pouvez consulter le suivi en ligne : <a href="${trackUrl}">${trackUrl}</a></p>`;
+        const combinedHtml = preamble + invoiceHtml;
+
+        const result = await sendMail({
+          to: ticketForEmail.client_email,
+          subject,
+          html: combinedHtml,
+          attachments: [
+            {
+              filename: "logo.jpg",
+              path: path.join(process.cwd(), "public", "logo.jpg"),
+              cid: logoCid,
+            },
+          ],
+        });
+        console.log("Completion email result:", result);
+      } catch (err) {
+        console.error("Failed to send completion email (dev):", err);
+      }
+    }
 
     const [[ticket]] = await conn.query(
       "SELECT * FROM tickets WHERE ticket_id = ?",

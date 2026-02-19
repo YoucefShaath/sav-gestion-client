@@ -9,6 +9,7 @@
     "dev": "next dev",
     "php:dev": "php -S localhost:8000 -t php-api/public",
     "build": "next build",
+    "export": "next build",
     "start": "NODE_ENV=production node server.js",
     "db:seed": "node scripts/seed-db.js"
   },

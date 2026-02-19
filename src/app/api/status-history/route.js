@@ -1,6 +1,8 @@
 import pool from "@/lib/db";
 import { NextResponse } from "next/server";
 
+export const dynamic = "force-static";
+
 export async function GET(req) {
   if (process.env.NODE_ENV === "production")
     return NextResponse.json(

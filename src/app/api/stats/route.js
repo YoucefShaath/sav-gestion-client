@@ -1,6 +1,8 @@
 import pool from "@/lib/db";
 import { NextResponse } from "next/server";
 
+export const dynamic = "force-static";
+
 // Dev-only fallback: mirror php-api/api/stats.php
 export async function GET() {
   if (process.env.NODE_ENV === "production")

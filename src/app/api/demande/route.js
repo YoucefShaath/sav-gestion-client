@@ -1,6 +1,8 @@
 import pool from "@/lib/db";
 import { NextResponse } from "next/server";
 
+export const dynamic = "force-static";
+
 // Dev fallback for entreprise 'demande' endpoint (GET list, POST create)
 export async function GET(req) {
   if (process.env.NODE_ENV === "production")
@@ -104,6 +106,42 @@ export async function POST(req) {
       ],
     );
     return NextResponse.json({ success: true, id: res.insertId });
+  } finally {
+    conn.release();
+  }
+}
+
+// Delete a demande (dev fallback) — mirrors php-api DELETE behavior
+export async function DELETE(req) {
+  if (process.env.NODE_ENV === "production")
+    return NextResponse.json(
+      { error: "Not available in production" },
+      { status: 404 },
+    );
+
+  const url = new URL(req.url);
+  const id = url.searchParams.get("id");
+  if (!id) return NextResponse.json({ error: "ID requis" }, { status: 400 });
+
+  const conn = await pool.getConnection();
+  try {
+    const [rows] = await conn.query("SELECT id FROM demandes WHERE id = ?", [
+      id,
+    ]);
+    if (!rows.length)
+      return NextResponse.json(
+        { error: "Demande introuvable." },
+        { status: 404 },
+      );
+
+    await conn.query("DELETE FROM demandes WHERE id = ?", [id]);
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error("dev /api/demande DELETE error:", err);
+    return NextResponse.json(
+      { error: "Erreur lors de la suppression." },
+      { status: 500 },
+    );
   } finally {
     conn.release();
   }
