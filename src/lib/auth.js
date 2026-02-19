@@ -12,10 +12,23 @@ export async function loginTechnician(username, password) {
     body: JSON.stringify({ username, password }),
   });
 
-  const data = await res.json();
+  // Try to parse JSON, but fall back to text when server returns HTML/plain-text errors
+  let data;
+  let text;
+  try {
+    data = await res.json();
+  } catch (err) {
+    text = await res.text();
+  }
 
   if (!res.ok) {
-    throw new Error(data.error || "Erreur de connexion");
+    const message = (data && (data.error || data.message)) || text || `Erreur de connexion (${res.status})`;
+    throw new Error(message);
+  }
+
+  if (!data) {
+    // successful HTTP status but non-JSON body — surface raw text
+    throw new Error(text || "Réponse inattendue du serveur");
   }
 
   // Store session
@@ -54,8 +67,16 @@ export function getUser() {
  */
 export async function lookupTicketsByPhone(phone) {
   const res = await fetch(`/api/tickets?search=${encodeURIComponent(phone)}`);
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || "Erreur");
+
+  let data;
+  let text;
+  try {
+    data = await res.json();
+  } catch (err) {
+    text = await res.text();
+  }
+
+  if (!res.ok) throw new Error((data && (data.error || data.message)) || text || `Erreur (${res.status})`);
   return data.data || data;
 }
 

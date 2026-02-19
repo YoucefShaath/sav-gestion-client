@@ -37,19 +37,20 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 ## Environment variables
 
-- `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS` — configure outgoing email (nodemailer). If SMTP credentials are not set in development, the app will simulate sending and log to console.
+- `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS` — configure outgoing email (used by the PHP backend). If SMTP credentials are not set in development, the application will simulate sends or log them to the console.
 - `EMAIL_ON_COMPLETED` — (optional) set to `false` to disable automatic emails when a ticket status changes to **Terminé**. Defaults to enabled.
 - `NEXT_PUBLIC_APP_URL` — (optional) base URL used in links inside emails (e.g. `https://example.com`). If not set, the request origin is used.
 
 ---
 
-## PHP backend (optional)
+## PHP backend (canonical) ✅
 
-A lightweight PHP backend is available in `php-api/` that replicates the Node API routes so the React frontend can keep calling `/api/*` without code changes.
+The PHP backend in `php-api/` is now the canonical API implementation. Next.js API routes and the server-side Node helpers for email/invoice rendering have been removed — all `/api/*` requests (including outgoing email) are handled by `php-api`.
 
 Local development:
 
 - Start the PHP API: `npm run php:dev` (serves `http://localhost:8000`)
-- Start Next.js: `npm run dev` — `next.config.mjs` rewrites `/api/*` to the PHP server in development.
+- Start Next.js: `npm run dev` — `next.config.mjs` rewrites `/api/*` to the PHP server during development.
+- To test email delivery, POST to `/api/send-invoice` or call the PHP endpoints directly.
 
 Deployment (cPanel): copy `php-api/public` to your `public_html` and keep the other `php-api` files next to it. `.htaccess` is provided to route `/api/*` to the PHP router.
