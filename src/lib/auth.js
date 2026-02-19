@@ -12,13 +12,14 @@ export async function loginTechnician(username, password) {
     body: JSON.stringify({ username, password }),
   });
 
-  // Try to parse JSON, but fall back to text when server returns HTML/plain-text errors
-  let data;
-  let text;
+  // Read the response body once (text) then try to parse JSON from it — avoids stream-already-read errors
+  const raw = await res.text();
+  let data = null;
+  const text = raw;
   try {
-    data = await res.json();
+    data = raw ? JSON.parse(raw) : null;
   } catch (err) {
-    text = await res.text();
+    // not JSON — keep `data` as null and use `text` below
   }
 
   if (!res.ok) {
@@ -68,16 +69,17 @@ export function getUser() {
 export async function lookupTicketsByPhone(phone) {
   const res = await fetch(`/api/tickets?search=${encodeURIComponent(phone)}`);
 
-  let data;
-  let text;
+  const raw = await res.text();
+  let data = null;
+  const text = raw;
   try {
-    data = await res.json();
+    data = raw ? JSON.parse(raw) : null;
   } catch (err) {
-    text = await res.text();
+    // ignore — we'll use text for errors
   }
 
   if (!res.ok) throw new Error((data && (data.error || data.message)) || text || `Erreur (${res.status})`);
-  return data.data || data;
+  return data?.data || data;
 }
 
 export async function lookupTicketById(ticketId) {
