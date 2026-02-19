@@ -90,3 +90,118 @@ export async function GET(req) {
     conn.release();
   }
 }
+
+export async function POST(req) {
+  // Dev-only createTicket fallback (mirrors php-api/api/tickets.php)
+  if (process.env.NODE_ENV === "production")
+    return NextResponse.json(
+      { error: "Not available in production" },
+      { status: 404 },
+    );
+
+  const body = await req.json().catch(() => null);
+  if (!body)
+    return NextResponse.json({ error: "Requête invalide" }, { status: 400 });
+
+  const {
+    client_name,
+    client_phone,
+    client_email,
+    hardware_category,
+    brand,
+    model,
+    reference,
+    serial_number,
+    problem_description,
+    priority = "Normal",
+    location = "Reception",
+  } = body;
+
+  // Basic validation (same rules as php-api)
+  const errors = [];
+  if (!client_name || !String(client_name).trim()) errors.push("client_name");
+  if (!client_phone || !String(client_phone).trim())
+    errors.push("client_phone");
+  if (!hardware_category || !String(hardware_category).trim())
+    errors.push("hardware_category");
+  if (!brand || !String(brand).trim()) errors.push("brand");
+  if (!problem_description || !String(problem_description).trim())
+    errors.push("problem_description");
+  if (errors.length)
+    return NextResponse.json(
+      { errors, error: "Champs obligatoires manquants." },
+      { status: 422 },
+    );
+
+  // reuse client-side phone validator
+  const { validatePhone } = await import("@/lib/utils");
+  if (!validatePhone(client_phone))
+    return NextResponse.json(
+      { error: "Numéro de téléphone invalide." },
+      { status: 422 },
+    );
+
+  const conn = await pool.getConnection();
+  try {
+    // Generate ticket id SAV-YYMMDD-XXXX
+    const now = new Date();
+    const yy = String(now.getFullYear()).slice(2);
+    const mm = String(now.getMonth() + 1).padStart(2, "0");
+    const dd = String(now.getDate()).padStart(2, "0");
+    const prefix = `SAV-${yy}${mm}${dd}-`;
+
+    const [[last]] = await conn.query(
+      "SELECT ticket_id FROM tickets WHERE ticket_id LIKE ? ORDER BY id DESC LIMIT 1",
+      [prefix + "%"],
+    );
+    let seq = 1;
+    if (last && last.ticket_id) {
+      const n = parseInt(last.ticket_id.slice(-4), 10);
+      if (n) seq = n + 1;
+    }
+    const ticketId = prefix + String(seq).padStart(4, "0");
+
+    await conn.query(
+      `INSERT INTO tickets (ticket_id, client_name, client_phone, client_email, hardware_category, brand, model, serial_number, problem_description, status, location, priority, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Received', ?, ?, NOW(), NOW())`,
+      [
+        ticketId,
+        client_name,
+        client_phone,
+        client_email || null,
+        hardware_category,
+        brand,
+        model || null,
+        serial_number || null,
+        problem_description,
+        location || null,
+        priority || "Normal",
+      ],
+    );
+
+    await conn.query(
+      "INSERT INTO status_history (ticket_id, new_status, changed_at) VALUES (?, ?, NOW())",
+      [ticketId, "Received"],
+    );
+
+    const [[ticket]] = await conn.query(
+      "SELECT * FROM tickets WHERE ticket_id = ?",
+      [ticketId],
+    );
+    const [history] = await conn.query(
+      "SELECT * FROM status_history WHERE ticket_id = ? ORDER BY changed_at ASC",
+      [ticketId],
+    );
+    ticket.history = history;
+
+    return NextResponse.json(ticket);
+  } catch (err) {
+    console.error("dev /api/tickets POST error:", err);
+    return NextResponse.json(
+      { error: "Erreur lors de la création du ticket." },
+      { status: 500 },
+    );
+  } finally {
+    conn.release();
+  }
+}
