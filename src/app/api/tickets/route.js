@@ -205,3 +205,202 @@ export async function POST(req) {
     conn.release();
   }
 }
+
+// ── Dev-only update (PUT), status change (PATCH) and delete (DELETE) handlers ──
+export async function PUT(req) {
+  if (process.env.NODE_ENV === "production")
+    return NextResponse.json(
+      { error: "Not available in production" },
+      { status: 404 },
+    );
+
+  const url = new URL(req.url);
+  const id = url.searchParams.get("id");
+  if (!id) return NextResponse.json({ error: "ID requis" }, { status: 400 });
+
+  const body = await req.json().catch(() => null);
+  if (!body)
+    return NextResponse.json({ error: "Requête invalide" }, { status: 400 });
+
+  const allowed = [
+    "client_name",
+    "client_phone",
+    "client_email",
+    "hardware_category",
+    "brand",
+    "model",
+    "serial_number",
+    "problem_description",
+    "diagnostic_notes",
+    "technician_notes",
+    "estimated_cost",
+    "final_cost",
+    "priority",
+    "location",
+  ];
+
+  const sets = [];
+  const params = [];
+  for (const k of allowed) {
+    if (Object.prototype.hasOwnProperty.call(body, k)) {
+      sets.push(`${k} = ?`);
+      params.push(body[k] ?? null);
+    }
+  }
+
+  if (sets.length === 0)
+    return NextResponse.json(
+      { error: "Aucune donnée à mettre à jour" },
+      { status: 400 },
+    );
+
+  if (body.client_phone) {
+    const { validatePhone } = await import("@/lib/utils");
+    if (!validatePhone(body.client_phone))
+      return NextResponse.json(
+        { error: "Numéro de téléphone invalide." },
+        { status: 422 },
+      );
+  }
+
+  params.push(id);
+  const conn = await pool.getConnection();
+  try {
+    await conn.query(
+      `UPDATE tickets SET ${sets.join(", ")}, updated_at = NOW() WHERE ticket_id = ?`,
+      params,
+    );
+    const [[ticket]] = await conn.query(
+      "SELECT * FROM tickets WHERE ticket_id = ?",
+      [id],
+    );
+    const [history] = await conn.query(
+      "SELECT * FROM status_history WHERE ticket_id = ? ORDER BY changed_at ASC",
+      [id],
+    );
+    ticket.history = history;
+    return NextResponse.json(ticket);
+  } catch (err) {
+    console.error("dev /api/tickets PUT error:", err);
+    return NextResponse.json({ error: "Erreur interne" }, { status: 500 });
+  } finally {
+    conn.release();
+  }
+}
+
+export async function PATCH(req) {
+  if (process.env.NODE_ENV === "production")
+    return NextResponse.json(
+      { error: "Not available in production" },
+      { status: 404 },
+    );
+
+  const url = new URL(req.url);
+  const id = url.searchParams.get("id");
+  if (!id) return NextResponse.json({ error: "ID requis" }, { status: 400 });
+
+  const body = await req.json().catch(() => null);
+  if (!body || !body.status)
+    return NextResponse.json(
+      { error: "Nouveau statut requis" },
+      { status: 400 },
+    );
+  const newStatus = body.status;
+
+  const { TRANSITIONS } = await import("@/lib/utils");
+  const conn = await pool.getConnection();
+  try {
+    const [[row]] = await conn.query(
+      "SELECT status, client_email, client_name FROM tickets WHERE ticket_id = ?",
+      [id],
+    );
+    if (!row)
+      return NextResponse.json(
+        { error: "Ticket introuvable." },
+        { status: 404 },
+      );
+    const current = row.status;
+
+    const allowed = TRANSITIONS[current] || [];
+    if (!allowed.includes(newStatus))
+      return NextResponse.json(
+        { error: `Transition invalide: ${current} → ${newStatus}` },
+        { status: 400 },
+      );
+
+    await conn.beginTransaction();
+    await conn.query(
+      "UPDATE tickets SET status = ?, updated_at = NOW() WHERE ticket_id = ?",
+      [newStatus, id],
+    );
+    await conn.query(
+      "INSERT INTO status_history (ticket_id, old_status, new_status, changed_at) VALUES (?, ?, ?, NOW())",
+      [id, current, newStatus],
+    );
+    await conn.commit();
+
+    // Dev fallback: do NOT send email here (php-api is canonical for outgoing mail)
+
+    const [[ticket]] = await conn.query(
+      "SELECT * FROM tickets WHERE ticket_id = ?",
+      [id],
+    );
+    const [history] = await conn.query(
+      "SELECT * FROM status_history WHERE ticket_id = ? ORDER BY changed_at ASC",
+      [id],
+    );
+    ticket.history = history;
+    return NextResponse.json(ticket);
+  } catch (err) {
+    try {
+      await conn.rollback();
+    } catch (e) {}
+    console.error("dev /api/tickets PATCH error:", err);
+    return NextResponse.json({ error: "Erreur interne" }, { status: 500 });
+  } finally {
+    conn.release();
+  }
+}
+
+export async function DELETE(req) {
+  if (process.env.NODE_ENV === "production")
+    return NextResponse.json(
+      { error: "Not available in production" },
+      { status: 404 },
+    );
+
+  const url = new URL(req.url);
+  const id = url.searchParams.get("id");
+  if (!id) return NextResponse.json({ error: "ID requis" }, { status: 400 });
+
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+    const [[exists]] = await conn.query(
+      "SELECT ticket_id FROM tickets WHERE ticket_id = ?",
+      [id],
+    );
+    if (!exists) {
+      await conn.rollback();
+      return NextResponse.json(
+        { error: "Ticket introuvable." },
+        { status: 404 },
+      );
+    }
+    await conn.query("DELETE FROM status_history WHERE ticket_id = ?", [id]);
+    await conn.query("DELETE FROM tickets WHERE ticket_id = ?", [id]);
+    await conn.commit();
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    try {
+      await conn.rollback();
+    } catch (e) {}
+    console.error("dev /api/tickets DELETE error:", err);
+    return NextResponse.json(
+      { error: "Erreur lors de la suppression." },
+      { status: 500 },
+    );
+  } finally {
+    conn.release();
+  }
+}
